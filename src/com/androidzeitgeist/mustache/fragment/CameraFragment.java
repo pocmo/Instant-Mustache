@@ -1,10 +1,11 @@
 package com.androidzeitgeist.mustache.fragment;
 
-import java.io.IOException;
 import java.util.List;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.Size;
@@ -24,7 +25,7 @@ import com.androidzeitgeist.mustache.view.CameraPreview;
  *
  * @author Sebastian Kaspari <sebastian@androidzeitgeist.com>
  */
-public class CameraFragment extends Fragment implements SurfaceHolder.Callback {
+public class CameraFragment extends Fragment implements SurfaceHolder.Callback, Camera.PictureCallback {
     public static final String TAG = "Mustache/CameraFragment";
 
     private static final int PICTURE_SIZE_MAX_WIDTH = 1280;
@@ -101,8 +102,8 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback {
         try {
             camera.setPreviewDisplay(surfaceHolder);
             camera.startPreview();
-        } catch (IOException exception) {
-            Log.e(TAG, "Can't start camera preview due to IOException", exception);
+        } catch (Exception exception) {
+            Log.e(TAG, "Can't start camera preview due to Exception", exception);
 
             listener.onCameraError();
         }
@@ -207,6 +208,25 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback {
         }
 
         return bestSize;
+    }
+
+    /**
+     * Take a picture and notify the listener once the picture is taken.
+     */
+    public void takePicture() {
+        camera.takePicture(null, null, this);
+    }
+
+    /**
+     * A picture has been taken.
+     */
+    @Override
+    public void onPictureTaken(byte[] data, Camera camera) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+
+        Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length, options);
+
+        listener.onPictureTaken(bitmap);
     }
 
     /**
