@@ -1,0 +1,17 @@
+Instant Mustache is a fun app for Android devices that utilizes
+the face detection feature of Android 4.x to add mustaches to all
+detected faces. Users are able to take funny pictures and share
+them with their friends on social networks or other apps on their
+mobile phone.
+
+------------------------------------------------------------------
+
+The development process is publicly documented on the Android
+Zeitgeist blog.
+
+For a list of all currently published articles see:
+http://www.androidzeitgeist.com/p/instant-mustache.html
+
+------------------------------------------------------------------
+
+Copyright 2012 Sebastian Kaspari

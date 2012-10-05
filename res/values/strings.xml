@@ -1,0 +1,7 @@
+<resources>
+
+    <string name="app_name">Instant Mustache</string>
+
+    <string name="toast_error_camera_preview">Can\'t initialize camera preview.</string>
+
+</resources>

@@ -1,0 +1,5 @@
+
+# Ignore binaries and generated files
+gen/
+bin/
+
