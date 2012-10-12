@@ -7,9 +7,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -111,11 +113,9 @@ public class CameraActivity extends Activity implements CameraFragmentListener {
             null
         );
 
-        Toast.makeText(
-            this,
-            getString(R.string.toast_saved_picture, mediaFile.toString()),
-            Toast.LENGTH_SHORT
-        ).show();
+        Intent intent = new Intent(this, PhotoActivity.class);
+        intent.setData(Uri.fromFile(mediaFile));
+        startActivity(intent);
 
         finish();
     }

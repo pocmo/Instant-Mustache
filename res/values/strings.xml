@@ -2,8 +2,6 @@
 
     <string name="app_name">Instant Mustache</string>
 
-    <string name="toast_saved_picture">Saved picture %1$s</string>
-
     <string name="toast_error_camera_preview">Can\'t initialize camera preview.</string>
     <string name="toast_error_save_picture">Can\'t save picture on external storage.</string>
 
