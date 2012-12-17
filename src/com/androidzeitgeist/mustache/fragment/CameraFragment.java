@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.Size;
@@ -18,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.androidzeitgeist.mustache.listener.CameraFragmentListener;
+import com.androidzeitgeist.mustache.listener.CameraOrientationListener;
 import com.androidzeitgeist.mustache.view.CameraPreview;
 
 /**
@@ -35,6 +37,10 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback, 
     private Camera camera;
     private SurfaceHolder surfaceHolder;
     private CameraFragmentListener listener;
+    private int displayOrientation;
+    private int layoutOrientation;
+
+    private CameraOrientationListener orientationListener;
 
     /**
      * On activity getting attached.
@@ -50,6 +56,8 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback, 
         }
 
         listener = (CameraFragmentListener) activity;
+
+        orientationListener = new CameraOrientationListener(activity);
     }
 
     /**
@@ -71,6 +79,8 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback, 
     public void onResume() {
         super.onResume();
 
+        orientationListener.enable();
+
         try {
             camera = Camera.open(cameraId);
         } catch (Exception exception) {
@@ -87,6 +97,8 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback, 
     @Override
     public void onPause() {
         super.onPause();
+
+        orientationListener.disable();
 
         stopCameraPreview();
         camera.release();
@@ -158,6 +170,9 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback, 
             displayOrientation = (cameraInfo.orientation - degrees + 360) % 360;
         }
 
+        this.displayOrientation = displayOrientation;
+        this.layoutOrientation  = degrees;
+
         camera.setDisplayOrientation(displayOrientation);
     }
 
@@ -214,6 +229,8 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback, 
      * Take a picture and notify the listener once the picture is taken.
      */
     public void takePicture() {
+        orientationListener.rememberOrientation();
+
         camera.takePicture(null, null, this);
     }
 
@@ -222,9 +239,32 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback, 
      */
     @Override
     public void onPictureTaken(byte[] data, Camera camera) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
+        Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
 
-        Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length, options);
+        int rotation = (
+            displayOrientation
+            + orientationListener.getRememberedOrientation()
+            + layoutOrientation
+        ) % 360;
+
+        if (rotation != 0) {
+            Bitmap oldBitmap = bitmap;
+
+            Matrix matrix = new Matrix();
+            matrix.postRotate(rotation);
+
+            bitmap = Bitmap.createBitmap(
+                bitmap,
+                0,
+                0,
+                bitmap.getWidth(),
+                bitmap.getHeight(),
+                matrix,
+                false
+            );
+
+            oldBitmap.recycle();
+        }
 
         listener.onPictureTaken(bitmap);
     }
