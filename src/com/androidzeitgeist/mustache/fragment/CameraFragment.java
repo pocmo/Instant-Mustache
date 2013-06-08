@@ -16,6 +16,8 @@ import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.ImageButton;
+import com.androidzeitgeist.mustache.R;
 import com.androidzeitgeist.mustache.listener.CameraFragmentListener;
 import com.androidzeitgeist.mustache.listener.CameraOrientationListener;
 import com.androidzeitgeist.mustache.view.CameraPreview;
@@ -31,7 +33,7 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback, 
     private static final int PICTURE_SIZE_MAX_WIDTH = 1280;
     private static final int PREVIEW_SIZE_MAX_WIDTH = 640;
 
-    private int cameraId;
+    private int cameraId = CameraInfo.CAMERA_FACING_BACK;
     private Camera camera;
     private SurfaceHolder surfaceHolder;
     private CameraFragmentListener listener;
@@ -80,7 +82,7 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback, 
         orientationListener.enable();
 
         try {
-            camera = Camera.open(cameraId);
+            startCamera();
         } catch (Exception exception) {
             Log.e(TAG, "Can't open camera with id " + cameraId, exception);
 
@@ -98,8 +100,7 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback, 
 
         orientationListener.disable();
 
-        stopCameraPreview();
-        camera.release();
+        stopCamera();
     }
 
     /**
@@ -187,6 +188,8 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback, 
         parameters.setPictureSize(bestPictureSize.width, bestPictureSize.height);
 
         camera.setParameters(parameters);
+
+        setFlashButtonState();
     }
 
     private Size determineBestPreviewSize(Camera.Parameters parameters) {
@@ -230,6 +233,48 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback, 
         orientationListener.rememberOrientation();
 
         camera.takePicture(null, null, this);
+    }
+
+    public void swapCamera() {
+        if (Camera.getNumberOfCameras() > 1 && cameraId < Camera.getNumberOfCameras() - 1) {
+            cameraId = cameraId + 1;
+        } else {
+            cameraId = CameraInfo.CAMERA_FACING_BACK;
+        }
+        startCamera();
+    }
+
+    public void swapFlash() {
+        Camera.Parameters params = camera.getParameters();
+        List<String> flashModes = params.getSupportedFlashModes();
+        if (flashModes == null || flashModes.size() == 0) {
+            return;
+        }
+
+        String currentFlashMode = params.getFlashMode();
+        String newFlashMode = currentFlashMode;
+        if (currentFlashMode.equals(Camera.Parameters.FLASH_MODE_OFF) && flashModes.contains(Camera.Parameters.FLASH_MODE_AUTO)) {
+            newFlashMode = Camera.Parameters.FLASH_MODE_AUTO;
+        }
+        else if(currentFlashMode.equals(Camera.Parameters.FLASH_MODE_OFF) && flashModes.contains(Camera.Parameters.FLASH_MODE_ON)) {
+            newFlashMode = Camera.Parameters.FLASH_MODE_ON;
+        }
+        else if(currentFlashMode.equals(Camera.Parameters.FLASH_MODE_AUTO) && flashModes.contains(Camera.Parameters.FLASH_MODE_ON)) {
+            newFlashMode = Camera.Parameters.FLASH_MODE_ON;
+        }
+        else if(currentFlashMode.equals(Camera.Parameters.FLASH_MODE_AUTO) && flashModes.contains(Camera.Parameters.FLASH_MODE_OFF)) {
+            newFlashMode = Camera.Parameters.FLASH_MODE_OFF;
+        }
+        else if(currentFlashMode.equals(Camera.Parameters.FLASH_MODE_ON) && flashModes.contains(Camera.Parameters.FLASH_MODE_OFF)) {
+            newFlashMode = Camera.Parameters.FLASH_MODE_OFF;
+        }
+        else if(currentFlashMode.equals(Camera.Parameters.FLASH_MODE_ON) && flashModes.contains(Camera.Parameters.FLASH_MODE_AUTO)) {
+            newFlashMode = Camera.Parameters.FLASH_MODE_AUTO;
+        }
+
+        params.setFlashMode(newFlashMode);
+        camera.setParameters(params);
+        setFlashButtonState();
     }
 
     /**
@@ -310,5 +355,40 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback, 
     public void surfaceDestroyed(SurfaceHolder holder) {
         // We don't need to handle this case as the fragment takes care of
         // releasing the camera when needed.
+    }
+
+
+    private void startCamera() {
+        if (camera != null) {
+            stopCamera();
+        }
+        camera = Camera.open(cameraId);
+        startCameraPreview();
+    }
+
+    private void stopCamera(){
+        stopCameraPreview();
+        camera.release();
+    }
+
+    private void setFlashButtonState()
+    {
+        List<String> flashModes = camera.getParameters().getSupportedFlashModes();
+        ImageButton flashModeButton = (ImageButton)getActivity().findViewById(R.id.flash_mode_button);
+        if (null == flashModes || flashModes.size() == 0) {
+            flashModeButton.setVisibility(View.INVISIBLE);
+        }
+        else {
+            flashModeButton.setVisibility(View.VISIBLE);
+            if (camera.getParameters().getFlashMode().equals(Camera.Parameters.FLASH_MODE_OFF)) {
+                flashModeButton.setImageResource(R.drawable.action_bar_glyph_flash_off);
+            }
+            if (camera.getParameters().getFlashMode().equals(Camera.Parameters.FLASH_MODE_ON)) {
+                flashModeButton.setImageResource(R.drawable.action_bar_glyph_flash_on);
+            }
+            if (camera.getParameters().getFlashMode().equals(Camera.Parameters.FLASH_MODE_AUTO)) {
+                flashModeButton.setImageResource(R.drawable.action_bar_glyph_flash_auto);
+            }
+        }
     }
 }
