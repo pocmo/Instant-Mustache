@@ -8,4 +8,6 @@
     <string name="toast_error_save_picture">Can\'t save picture on external storage.</string>
 
     <string name="content_description_take_picture">Take picture</string>
+    <string name="content_description_swap_camera">Switch camera</string>
+    <string name="content_description_swap_flash">Switch flash mode</string>
 </resources>

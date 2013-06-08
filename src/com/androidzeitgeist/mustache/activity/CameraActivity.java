@@ -73,6 +73,16 @@ public class CameraActivity extends Activity implements CameraFragmentListener {
         fragment.takePicture();
     }
 
+    public void swapCamera(View view) {
+        CameraFragment fragment = (CameraFragment) getFragmentManager().findFragmentById(R.id.camera_fragment);
+        fragment.swapCamera();
+    }
+
+    public void swapFlash(View view) {
+        CameraFragment fragment = (CameraFragment) getFragmentManager().findFragmentById(R.id.camera_fragment);
+        fragment.swapFlash();
+    }
+
     /**
      * A picture has been taken.
      */
