@@ -4,9 +4,7 @@ import java.util.List;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
+import android.graphics.*;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.Size;
@@ -266,7 +264,22 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback, 
             oldBitmap.recycle();
         }
 
+        bitmap = cropBitmapToSquare(bitmap);
+
         listener.onPictureTaken(bitmap);
+    }
+
+    private Bitmap cropBitmapToSquare(Bitmap source)
+    {
+        Bitmap cropped;
+        int h = source.getHeight();
+        int w = source.getWidth();
+        if (w >= h){
+            cropped = Bitmap.createBitmap(source, w/2 - h/2, 0, h, h);
+        }else{
+            cropped = Bitmap.createBitmap(source,0, h/2 - w/2, w, w);
+        }
+        return cropped;
     }
 
     /**

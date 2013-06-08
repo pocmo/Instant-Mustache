@@ -4,21 +4,31 @@
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
     android:orientation="vertical" >
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                 android:layout_width="fill_parent"
+                 android:layout_height="fill_parent"
+            >
 
-    <fragment
-        android:id="@+id/camera_fragment"
-        android:name="com.androidzeitgeist.mustache.fragment.CameraFragment"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_gravity="center"
-        android:layout_weight="1" />
-
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="15dp"
-        android:contentDescription="@string/content_description_take_picture"
-        android:onClick="takePicture"
-        android:src="@drawable/ic_action_camera" />
+        <fragment
+            android:id="@+id/camera_fragment"
+            android:name="com.androidzeitgeist.mustache.fragment.CameraFragment"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical"
+        />
+        <com.androidzeitgeist.mustache.view.CameraOverlayView
+            android:id="@+id/camera_overlay"
+            android:layout_height="fill_parent"
+            android:layout_width="fill_parent"
+        />
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="15dp"
+            android:contentDescription="@string/content_description_take_picture"
+            android:onClick="takePicture"
+            android:src="@drawable/ic_action_camera" android:layout_gravity="center_horizontal|bottom"
+        />
+    </FrameLayout>
 
 </LinearLayout>

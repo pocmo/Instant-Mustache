@@ -3,6 +3,8 @@ package com.androidzeitgeist.mustache.view;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.SurfaceView;
+import com.androidzeitgeist.mustache.R;
+import com.androidzeitgeist.mustache.fragment.CameraFragment;
 
 /**
  * {@link SurfaceView} for displaying a squared camera preview.
