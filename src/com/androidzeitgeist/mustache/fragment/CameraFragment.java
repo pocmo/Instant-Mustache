@@ -209,7 +209,7 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback, 
         for (Size currentSize : sizes) {
             boolean isDesiredRatio = (currentSize.width / 4) == (currentSize.height / 3);
             boolean isBetterSize = (bestSize == null || currentSize.width > bestSize.width);
-            boolean isInBounds = currentSize.width <= PICTURE_SIZE_MAX_WIDTH;
+            boolean isInBounds = currentSize.width <= widthThreshold;
 
             if (isDesiredRatio && isInBounds && isBetterSize) {
                 bestSize = currentSize;
